@@ -1,20 +1,93 @@
-п»ї// s2lr4.cpp : Р­С‚РѕС‚ С„Р°Р№Р» СЃРѕРґРµСЂР¶РёС‚ С„СѓРЅРєС†РёСЋ "main". Р—РґРµСЃСЊ РЅР°С‡РёРЅР°РµС‚СЃСЏ Рё Р·Р°РєР°РЅС‡РёРІР°РµС‚СЃСЏ РІС‹РїРѕР»РЅРµРЅРёРµ РїСЂРѕРіСЂР°РјРјС‹.
-//
-
 #include <iostream>
+#include <Windows.h>
+
+#include "fio.h"
+#include "letter.h"
+
+#pragma warning (disable : 4996) //Без этого ругается на fopen и strcpy https://stackoverflow.com/questions/14386/fopen-deprecated-warning
+
+#define ONE_STRING_WITH 20
+#define MAX_WIDTH 60
+
+
+//FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+// ПРОТОТИПЫ МЕТОДОВ
+//FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+
+char menu(); //Меню функций базы
+
 
 int main()
 {
-    std::cout << "Hello World!\n";
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
+
+	char choice;
+
+	letter* tmpLetter = new letter(); //временная переменная - указатель на письмо
+	letter* baseL = nullptr; //база писем в памяти и доставок
+
+	baseL = baseL->loadRecords(); //чтение данных из файла в память
+
+	do {
+		choice = menu();
+
+		switch (choice)
+		{
+		case '1': //1 - Добавить новое письмо в базу (Class letter)
+			tmpLetter->enterNewRecord();
+			baseL = tmpLetter->addNewRecord(baseL);
+			break;
+		case '2': //2 - Показать все записи
+			if(baseL != nullptr) baseL->showAllRecords();
+			break;
+	//	case '3': //3 -  Найти все письма определенного получателя
+	//		myLetter->inNameSearch();
+	//		break;
+	//	case '4': //4 -  Сортировка писем по увелечению стоимости
+	//		myLetter = priceSort(myLetter);
+	//		showAllRecords(myLetter);
+	//		break;
+	//	case '5': //5 -  Сортировка писем по алфавиту - адресу отправителя (перегрузка оператора !)
+	//		!(*myLetter);
+	//		showAllRecords(myLetter);
+	//		break;
+
+		default:
+			break;
+		}
+	} while (choice != '0');
+
+	if (baseL != nullptr) baseL->exitAndSave(); // запись базы из памяти на диск при выходе
 }
 
-// Р—Р°РїСѓСЃРє РїСЂРѕРіСЂР°РјРјС‹: CTRL+F5 РёР»Рё РјРµРЅСЋ "РћС‚Р»Р°РґРєР°" > "Р—Р°РїСѓСЃРє Р±РµР· РѕС‚Р»Р°РґРєРё"
-// РћС‚Р»Р°РґРєР° РїСЂРѕРіСЂР°РјРјС‹: F5 РёР»Рё РјРµРЅСЋ "РћС‚Р»Р°РґРєР°" > "Р—Р°РїСѓСЃС‚РёС‚СЊ РѕС‚Р»Р°РґРєСѓ"
+//FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+// РЕАЛИЗАЦИЯ МЕТОДОВ
+//FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 
-// РЎРѕРІРµС‚С‹ РїРѕ РЅР°С‡Р°Р»Сѓ СЂР°Р±РѕС‚С‹ 
-//   1. Р’ РѕРєРЅРµ РѕР±РѕР·СЂРµРІР°С‚РµР»СЏ СЂРµС€РµРЅРёР№ РјРѕР¶РЅРѕ РґРѕР±Р°РІР»СЏС‚СЊ С„Р°Р№Р»С‹ Рё СѓРїСЂР°РІР»СЏС‚СЊ РёРјРё.
-//   2. Р’ РѕРєРЅРµ Team Explorer РјРѕР¶РЅРѕ РїРѕРґРєР»СЋС‡РёС‚СЊСЃСЏ Рє СЃРёСЃС‚РµРјРµ СѓРїСЂР°РІР»РµРЅРёСЏ РІРµСЂСЃРёСЏРјРё.
-//   3. Р’ РѕРєРЅРµ "Р’С‹С…РѕРґРЅС‹Рµ РґР°РЅРЅС‹Рµ" РјРѕР¶РЅРѕ РїСЂРѕСЃРјР°С‚СЂРёРІР°С‚СЊ РІС‹С…РѕРґРЅС‹Рµ РґР°РЅРЅС‹Рµ СЃР±РѕСЂРєРё Рё РґСЂСѓРіРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ.
-//   4. Р’ РѕРєРЅРµ "РЎРїРёСЃРѕРє РѕС€РёР±РѕРє" РјРѕР¶РЅРѕ РїСЂРѕСЃРјР°С‚СЂРёРІР°С‚СЊ РѕС€РёР±РєРё.
-//   5. РџРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕ РІС‹Р±РµСЂРёС‚Рµ РїСѓРЅРєС‚С‹ РјРµРЅСЋ "РџСЂРѕРµРєС‚" > "Р”РѕР±Р°РІРёС‚СЊ РЅРѕРІС‹Р№ СЌР»РµРјРµРЅС‚", С‡С‚РѕР±С‹ СЃРѕР·РґР°С‚СЊ С„Р°Р№Р»С‹ РєРѕРґР°, РёР»Рё "РџСЂРѕРµРєС‚" > "Р”РѕР±Р°РІРёС‚СЊ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёР№ СЌР»РµРјРµРЅС‚", С‡С‚РѕР±С‹ РґРѕР±Р°РІРёС‚СЊ РІ РїСЂРѕРµРєС‚ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёРµ С„Р°Р№Р»С‹ РєРѕРґР°.
-//   6. Р§С‚РѕР±С‹ СЃРЅРѕРІР° РѕС‚РєСЂС‹С‚СЊ СЌС‚РѕС‚ РїСЂРѕРµРєС‚ РїРѕР·Р¶Рµ, РІС‹Р±РµСЂРёС‚Рµ РїСѓРЅРєС‚С‹ РјРµРЅСЋ "Р¤Р°Р№Р»" > "РћС‚РєСЂС‹С‚СЊ" > "РџСЂРѕРµРєС‚" Рё РІС‹Р±РµСЂРёС‚Рµ SLN-С„Р°Р№Р».
+char menu() //Меню функций базы
+{
+	char select;
+	std::cout << "==================================" << std::endl;
+	std::cout << "Меню:" << std::endl;
+	std::cout << "==================================" << std::endl;
+	std::cout << "1 - Добавить новое письмо в базу" << std::endl;
+	std::cout << "2 - Pаспечатка данных в табличном виде" << std::endl;
+	std::cout << "3 - Найти все письма определенного получателя" << std::endl;
+	std::cout << "4 - Сортировать писем по увелечению стоимости" << std::endl;
+	std::cout << "5 - Сортировка в алфавитном порядке (по адресу отправителя)" << std::endl;
+	std::cout << "0 - Выход из программы и запись базы на диск. Файл: " << BASE_NAME << std::endl;
+	std::cout << "----------------------------------" << std::endl;
+
+	do
+	{
+		std::cout << "Введите номер пункта меню: ";
+		std::cin >> select;
+		std::cin.ignore(32767, '\n'); // https://ravesli.com/urok-72-obrabotka-nekorrektnogo-vvoda-cherez-std-cin/
+
+	} while (select < '0' || select > '5');
+
+	return select;
+} // menu()
+
+
